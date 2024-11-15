@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/freemancodz/developer/azure/blobdemo/blobdemo.csproj": {}
+    "/Users/freemancodz/Developer/azure/blobdemo/blobdemo.csproj": {}
   },
   "projects": {
-    "/Users/freemancodz/developer/azure/blobdemo/blobdemo.csproj": {
+    "/Users/freemancodz/Developer/azure/blobdemo/blobdemo.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/freemancodz/developer/azure/blobdemo/blobdemo.csproj",
+        "projectUniqueName": "/Users/freemancodz/Developer/azure/blobdemo/blobdemo.csproj",
         "projectName": "blobdemo",
-        "projectPath": "/Users/freemancodz/developer/azure/blobdemo/blobdemo.csproj",
+        "projectPath": "/Users/freemancodz/Developer/azure/blobdemo/blobdemo.csproj",
         "packagesPath": "/Users/freemancodz/.nuget/packages/",
-        "outputPath": "/Users/freemancodz/developer/azure/blobdemo/obj/",
+        "outputPath": "/Users/freemancodz/Developer/azure/blobdemo/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/freemancodz/.nuget/NuGet/NuGet.Config"
@@ -50,6 +50,10 @@
             "Azure.Storage.Blobs": {
               "target": "Package",
               "version": "[12.23.0, )"
+            },
+            "Microsoft.Extensions.Azure": {
+              "target": "Package",
+              "version": "[1.8.0, )"
             }
           },
           "imports": [
