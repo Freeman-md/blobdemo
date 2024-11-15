@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/freemancodz/Developer/azure/blobdemo/blobdemo.csproj": {}
+    "/Users/freemancodz/developer/azure/blobdemo/blobdemo.csproj": {}
   },
   "projects": {
-    "/Users/freemancodz/Developer/azure/blobdemo/blobdemo.csproj": {
+    "/Users/freemancodz/developer/azure/blobdemo/blobdemo.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/freemancodz/Developer/azure/blobdemo/blobdemo.csproj",
+        "projectUniqueName": "/Users/freemancodz/developer/azure/blobdemo/blobdemo.csproj",
         "projectName": "blobdemo",
-        "projectPath": "/Users/freemancodz/Developer/azure/blobdemo/blobdemo.csproj",
+        "projectPath": "/Users/freemancodz/developer/azure/blobdemo/blobdemo.csproj",
         "packagesPath": "/Users/freemancodz/.nuget/packages/",
-        "outputPath": "/Users/freemancodz/Developer/azure/blobdemo/obj/",
+        "outputPath": "/Users/freemancodz/developer/azure/blobdemo/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/freemancodz/.nuget/NuGet/NuGet.Config"

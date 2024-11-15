@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "JiT3WBOyKMI=",
+  "dgSpecHash": "xvPulNfAskI=",
   "success": true,
-  "projectFilePath": "/Users/freemancodz/Developer/azure/blobdemo/blobdemo.csproj",
+  "projectFilePath": "/Users/freemancodz/developer/azure/blobdemo/blobdemo.csproj",
   "expectedPackageFiles": [
     "/Users/freemancodz/.nuget/packages/azure.core/1.44.1/azure.core.1.44.1.nupkg.sha512",
     "/Users/freemancodz/.nuget/packages/azure.identity/1.13.1/azure.identity.1.13.1.nupkg.sha512",

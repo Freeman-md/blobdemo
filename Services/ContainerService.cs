@@ -7,7 +7,40 @@ using Azure.Storage.Blobs.Specialized;
 public class ContainerService
 {
 
-    public static async Task<BlobContainerClient> CreateBlobContainer(BlobServiceClient blobServiceClient)
+    public BlobServiceClient blobServiceClient;
+
+    public ContainerService()
+    {
+        blobServiceClient = GetBlobServiceClient();
+    }
+
+    static BlobServiceClient GetBlobServiceClient()
+    {
+        try
+        {
+            // Initialize BlobServiceClient with DefaultAzureCredential
+            BlobServiceClient client = new BlobServiceClient(
+                new Uri("https://blobdemostorageaccount.blob.core.windows.net"),
+                new DefaultAzureCredential()
+            );
+
+            // Attempt to list the containers in the Blob Storage account
+            Console.WriteLine("Testing connection to Azure Blob Storage...");
+            Console.WriteLine("Connection successful!");
+
+            return client;
+        }
+        catch (Exception ex)
+        {
+            // Catch and display any errors
+            Console.WriteLine("Failed to connect to Azure Blob Storage.");
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+
+        return null;
+    }
+
+    public async Task<BlobContainerClient> CreateBlobContainer()
     {
         string containerName = "container-" + Guid.NewGuid();
 
@@ -32,7 +65,7 @@ public class ContainerService
 
     }
 
-    public static void CreateRootContainer(BlobServiceClient blobServiceClient)
+    public void CreateRootContainer()
     {
         try
         {
@@ -51,9 +84,9 @@ public class ContainerService
         }
     }
 
-    public static async Task DeleteSamepleContainerAsync(BlobServiceClient client, string contaainerName)
+    public async Task DeleteSamepleContainerAsync(string contaainerName)
     {
-        BlobContainerClient container = client.GetBlobContainerClient(contaainerName);
+        BlobContainerClient container = blobServiceClient.GetBlobContainerClient(contaainerName);
 
         try
         {
@@ -69,7 +102,7 @@ public class ContainerService
         }
     }
 
-    public async static Task ListContainers(BlobServiceClient blobServiceClient, string prefix, int? segmentSize)
+    public async Task ListContainers(string prefix, int? segmentSize)
     {
         try
         {
@@ -108,7 +141,7 @@ public class ContainerService
         }
     }
 
-    public static async Task<BlobLeaseClient> AcquireContainerLeaseAsync(BlobContainerClient blobContainerClient)
+    public async Task<BlobLeaseClient> AcquireContainerLeaseAsync(BlobContainerClient blobContainerClient)
     {
         BlobLeaseClient leaseClient = blobContainerClient.GetBlobLeaseClient();
 
@@ -119,106 +152,106 @@ public class ContainerService
         return leaseClient;
     }
 
-    public static async Task RenewContainerLeaseAsync(BlobContainerClient containerClient, string leaseID)
-{
-    // Create a BlobLeaseClient with the lease ID
-    BlobLeaseClient leaseClient = containerClient.GetBlobLeaseClient(leaseID);
+    public async Task RenewContainerLeaseAsync(BlobContainerClient containerClient, string leaseID)
+    {
+        // Create a BlobLeaseClient with the lease ID
+        BlobLeaseClient leaseClient = containerClient.GetBlobLeaseClient(leaseID);
 
-    // Renew the lease
-    await leaseClient.RenewAsync();
-    Console.WriteLine($"Lease with ID {leaseID} has been renewed.");
-}
+        // Renew the lease
+        await leaseClient.RenewAsync();
+        Console.WriteLine($"Lease with ID {leaseID} has been renewed.");
+    }
 
-public static async Task ReleaseContainerLeaseAsync(BlobContainerClient containerClient, string leaseID)
-{
-    // Create a BlobLeaseClient with the lease ID
-    BlobLeaseClient leaseClient = containerClient.GetBlobLeaseClient(leaseID);
+    public async Task ReleaseContainerLeaseAsync(BlobContainerClient containerClient, string leaseID)
+    {
+        // Create a BlobLeaseClient with the lease ID
+        BlobLeaseClient leaseClient = containerClient.GetBlobLeaseClient(leaseID);
 
-    // Release the lease
-    await leaseClient.ReleaseAsync();
-    Console.WriteLine($"Lease with ID {leaseID} has been released.");
-}
+        // Release the lease
+        await leaseClient.ReleaseAsync();
+        Console.WriteLine($"Lease with ID {leaseID} has been released.");
+    }
 
-public static async Task BreakContainerLeaseAsync(BlobContainerClient containerClient)
-{
-    // Create a BlobLeaseClient
-    BlobLeaseClient leaseClient = containerClient.GetBlobLeaseClient();
+    public async Task BreakContainerLeaseAsync(BlobContainerClient containerClient)
+    {
+        // Create a BlobLeaseClient
+        BlobLeaseClient leaseClient = containerClient.GetBlobLeaseClient();
 
-    // Break the lease
-    await leaseClient.BreakAsync();
-    Console.WriteLine("The lease has been broken.");
-}
+        // Break the lease
+        await leaseClient.BreakAsync();
+        Console.WriteLine("The lease has been broken.");
+    }
 
-public static async Task CheckLeaseStateAsync(BlobContainerClient containerClient)
-{
-    var properties = await containerClient.GetPropertiesAsync();
-    Console.WriteLine($"Lease State: {properties.Value.LeaseState}");
-    Console.WriteLine($"Lease Duration: {properties.Value.LeaseDuration}");
-    Console.WriteLine($"Lease Status: {properties.Value.LeaseStatus}");
-}
+    public async Task CheckLeaseStateAsync(BlobContainerClient containerClient)
+    {
+        var properties = await containerClient.GetPropertiesAsync();
+        Console.WriteLine($"Lease State: {properties.Value.LeaseState}");
+        Console.WriteLine($"Lease Duration: {properties.Value.LeaseDuration}");
+        Console.WriteLine($"Lease Status: {properties.Value.LeaseStatus}");
+    }
 
-public static async Task LeaseWorkflow(BlobContainerClient containerClient)
-{
-    // Acquire a lease
-    BlobLeaseClient leaseClient = await AcquireContainerLeaseAsync(containerClient);
+    public async Task LeaseWorkflow(BlobContainerClient containerClient)
+    {
+        // Acquire a lease
+        BlobLeaseClient leaseClient = await AcquireContainerLeaseAsync(containerClient);
 
-    // Perform operations...
+        // Perform operations...
 
-    // Renew the lease
-    await RenewContainerLeaseAsync(containerClient, leaseClient.LeaseId);
+        // Renew the lease
+        await RenewContainerLeaseAsync(containerClient, leaseClient.LeaseId);
 
-    // Perform more operations...
+        // Perform more operations...
 
-    // Release the lease
-    await ReleaseContainerLeaseAsync(containerClient, leaseClient.LeaseId);
-}
+        // Release the lease
+        await ReleaseContainerLeaseAsync(containerClient, leaseClient.LeaseId);
+    }
 
-public static async Task ManageProjectContainersAsync(BlobContainerClient container)
-{
-    // Step 1: Add metadata
-    await AddContainerMetadataAsync(container);
+    public async Task ManageProjectContainersAsync(BlobContainerClient container)
+    {
+        // Step 1: Add metadata
+        await AddContainerMetadataAsync(container);
 
-    // Step 2: Retrieve and display metadata
-    await ReadContainerMetadataAsync(container);
+        // Step 2: Retrieve and display metadata
+        await ReadContainerMetadataAsync(container);
 
-    // Step 3: Fetch system properties
-    await ReadContainerPropertiesAsync(container);
-}
+        // Step 3: Fetch system properties
+        await ReadContainerPropertiesAsync(container);
+    }
 
-// Set Metadata
-public static async Task AddContainerMetadataAsync(BlobContainerClient container)
-{
-    IDictionary<string, string> metadata = new Dictionary<string, string>
+    // Set Metadata
+    public async Task AddContainerMetadataAsync(BlobContainerClient container)
+    {
+        IDictionary<string, string> metadata = new Dictionary<string, string>
     {
         { "projectId", "12345" },
         { "owner", "team-a" },
         { "status", "active" }
     };
 
-    await container.SetMetadataAsync(metadata);
-    Console.WriteLine("Project metadata added.");
-}
-
-// Retrieve Metadata
-public static async Task ReadContainerMetadataAsync(BlobContainerClient container)
-{
-    var properties = await container.GetPropertiesAsync();
-
-    Console.WriteLine("Metadata:");
-    foreach (var metadataItem in properties.Value.Metadata)
-    {
-        Console.WriteLine($"{metadataItem.Key}: {metadataItem.Value}");
+        await container.SetMetadataAsync(metadata);
+        Console.WriteLine("Project metadata added.");
     }
-}
 
-// Read System Properties
-public static async Task ReadContainerPropertiesAsync(BlobContainerClient container)
-{
-    var properties = await container.GetPropertiesAsync();
+    // Retrieve Metadata
+    public async Task ReadContainerMetadataAsync(BlobContainerClient container)
+    {
+        var properties = await container.GetPropertiesAsync();
 
-    Console.WriteLine($"Public access level: {properties.Value.PublicAccess}");
-    Console.WriteLine($"Last modified: {properties.Value.LastModified}");
-}
+        Console.WriteLine("Metadata:");
+        foreach (var metadataItem in properties.Value.Metadata)
+        {
+            Console.WriteLine($"{metadataItem.Key}: {metadataItem.Value}");
+        }
+    }
+
+    // Read System Properties
+    public async Task ReadContainerPropertiesAsync(BlobContainerClient container)
+    {
+        var properties = await container.GetPropertiesAsync();
+
+        Console.WriteLine($"Public access level: {properties.Value.PublicAccess}");
+        Console.WriteLine($"Last modified: {properties.Value.LastModified}");
+    }
 
 
 }
