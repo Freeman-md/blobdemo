@@ -84,9 +84,9 @@ public class ContainerService
         }
     }
 
-    public async Task DeleteSamepleContainerAsync(string contaainerName)
+    public async Task DeleteSampleContainerAsync(string containerName)
     {
-        BlobContainerClient container = blobServiceClient.GetBlobContainerClient(contaainerName);
+        BlobContainerClient container = blobServiceClient.GetBlobContainerClient(containerName);
 
         try
         {
@@ -235,7 +235,7 @@ public class ContainerService
     // Retrieve Metadata
     public async Task ReadContainerMetadataAsync(BlobContainerClient container)
     {
-        var properties = await container.GetPropertiesAsync();
+        Response<BlobContainerProperties> properties = await container.GetPropertiesAsync();
 
         Console.WriteLine("Metadata:");
         foreach (var metadataItem in properties.Value.Metadata)
@@ -247,7 +247,7 @@ public class ContainerService
     // Read System Properties
     public async Task ReadContainerPropertiesAsync(BlobContainerClient container)
     {
-        var properties = await container.GetPropertiesAsync();
+        Response<BlobContainerProperties> properties = await container.GetPropertiesAsync();
 
         Console.WriteLine($"Public access level: {properties.Value.PublicAccess}");
         Console.WriteLine($"Last modified: {properties.Value.LastModified}");
