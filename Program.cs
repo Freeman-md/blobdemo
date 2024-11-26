@@ -6,12 +6,42 @@ using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
 
 
-ContainerService containerService = new ContainerService();
+BlobServiceClient GetBlobServiceClient()
+{
+    try
+    { 
+        // Initialize BlobServiceClient with DefaultAzureCredential
+        BlobServiceClient client = new BlobServiceClient(
+            new Uri("https://blobdemostorageaccount.blob.core.windows.net"),
+            new DefaultAzureCredential()
+        );
 
-string containerName = "container-2829bc18-6549-4279-95c2-2c991eae6a3a";
+        // Attempt to list the containers in the Blob Storage account
+        Console.WriteLine("Testing connection to Azure Blob Storage...");
+        Console.WriteLine("Connection successful!");
 
-BlobContainerClient blobContainerClient = containerService.blobServiceClient.GetBlobContainerClient(containerName);
+        return client;
+    }
+    catch (Exception ex)
+    {
+        // Catch and display any errors
+        Console.WriteLine("Failed to connect to Azure Blob Storage.");
+        Console.WriteLine($"Error: {ex.Message}");
+    }
 
-// await containerService.ManageProjectContainersAsync(blobContainerClient);
+    return null;
+}
+
+BlobServiceClient blobServiceClient = GetBlobServiceClient();
+
+ContainerService containerService = new ContainerService(blobServiceClient);
+
+await containerService.CreateBlobContainer();
+
+
+string containerName = "container-e55355af-d14a-481b-ae97-112b65ca02bc";
+
+BlobContainerClient blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
 
 BlobService blobService = new BlobService(blobContainerClient);
+await blobService.UploadTextBlobToContainer();

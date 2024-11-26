@@ -7,37 +7,11 @@ using Azure.Storage.Blobs.Specialized;
 public class ContainerService
 {
 
-    public BlobServiceClient blobServiceClient;
+    private readonly BlobServiceClient _blobServiceClient;
 
-    public ContainerService()
+    public ContainerService(BlobServiceClient blobServiceClient)
     {
-        blobServiceClient = GetBlobServiceClient();
-    }
-
-    static BlobServiceClient GetBlobServiceClient()
-    {
-        try
-        {
-            // Initialize BlobServiceClient with DefaultAzureCredential
-            BlobServiceClient client = new BlobServiceClient(
-                new Uri("https://blobdemostorageaccount.blob.core.windows.net"),
-                new DefaultAzureCredential()
-            );
-
-            // Attempt to list the containers in the Blob Storage account
-            Console.WriteLine("Testing connection to Azure Blob Storage...");
-            Console.WriteLine("Connection successful!");
-
-            return client;
-        }
-        catch (Exception ex)
-        {
-            // Catch and display any errors
-            Console.WriteLine("Failed to connect to Azure Blob Storage.");
-            Console.WriteLine($"Error: {ex.Message}");
-        }
-
-        return null;
+        _blobServiceClient = blobServiceClient;
     }
 
     public async Task<BlobContainerClient> CreateBlobContainer()
@@ -46,7 +20,7 @@ public class ContainerService
 
         try
         {
-            BlobContainerClient container = await blobServiceClient.CreateBlobContainerAsync(containerName);
+            BlobContainerClient container = await _blobServiceClient.CreateBlobContainerAsync(containerName);
 
             if (await container.ExistsAsync())
             {
@@ -69,7 +43,7 @@ public class ContainerService
     {
         try
         {
-            BlobContainerClient container = blobServiceClient.CreateBlobContainer("$root");
+            BlobContainerClient container = _blobServiceClient.CreateBlobContainer("$root");
 
             if (container.Exists())
             {
@@ -86,7 +60,7 @@ public class ContainerService
 
     public async Task DeleteSampleContainerAsync(string containerName)
     {
-        BlobContainerClient container = blobServiceClient.GetBlobContainerClient(containerName);
+        BlobContainerClient container = _blobServiceClient.GetBlobContainerClient(containerName);
 
         try
         {
@@ -107,7 +81,7 @@ public class ContainerService
         try
         {
             // Call the listing operation and retrieve pages of results
-            var resultSegment = blobServiceClient
+            var resultSegment = _blobServiceClient
                 .GetBlobContainersAsync(BlobContainerTraits.Metadata, prefix, default)
                 .AsPages(default, segmentSize);
 
