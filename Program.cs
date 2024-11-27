@@ -34,14 +34,12 @@ BlobServiceClient GetBlobServiceClient()
 
 BlobServiceClient blobServiceClient = GetBlobServiceClient();
 
-ContainerService containerService = new ContainerService(blobServiceClient);
-
-await containerService.CreateBlobContainer();
-
-
 string containerName = "container-e55355af-d14a-481b-ae97-112b65ca02bc";
 
 BlobContainerClient blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
 
 BlobService blobService = new BlobService(blobContainerClient);
-await blobService.UploadTextBlobToContainer();
+
+await blobService.GetBlobsInContainer(blobContainerClient, "project-1");
+
+// await blobService.UploadTextBlobWithPrefixAsync();

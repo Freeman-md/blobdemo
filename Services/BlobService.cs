@@ -1,5 +1,6 @@
 using Azure;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 
 public class BlobService
 {
@@ -9,16 +10,55 @@ public class BlobService
         _blobContainerClient = containerClient;
     }
 
-    public async Task UploadBlobToContainer(string fileName, string localFilePath)
+    public async Task UploadTextBlobWithPrefixAsync()
     {
         try
         {
-            // Get a reference to a blob
-            BlobClient blobClient = _blobContainerClient.GetBlobClient(fileName);
+            string localPath = "project-" + (new Random()).Next(1, 11); // Prefix for "folders"
+            string fileName = "file-" + (new Random()).Next(1, 11) + ".txt";
+            string localFilePath = Path.Combine(localPath, fileName);
 
-            Console.WriteLine("Uploading to Blob storage as blob:\n\t {0}\n", blobClient.Uri);
+            Directory.CreateDirectory(localPath);
+            await File.WriteAllTextAsync(localFilePath, fileName);
 
-            await blobClient.UploadAsync(localFilePath, true);
+            // Create a prefix for the blob (e.g., project-1/file-1.txt)
+            string blobName = $"{localPath}/{fileName}";
+
+            BlobClient blobClient = _blobContainerClient.GetBlobClient(blobName);
+
+            Console.WriteLine($"Uploading to Blob Storage with prefix:\n\t{blobClient.Uri}");
+
+            using FileStream fileStream = File.OpenRead(localFilePath);
+            await blobClient.UploadAsync(fileStream, overwrite: true);
+
+            IDictionary<string, string> metadata = new Dictionary<string, string>
+            {
+                { "status", "active" },
+                { "category", localPath }
+            };
+            await blobClient.SetMetadataAsync(metadata);
+
+            Console.WriteLine("Upload completed successfully.");
+        }
+        catch (RequestFailedException ex)
+        {
+            Console.WriteLine($"Request failed: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+        }
+    }
+
+
+    public async Task GetBlobsInContainer(BlobContainerClient blobContainerClient)
+    {
+        try
+        {
+            await foreach (var blob in blobContainerClient.GetBlobsAsync())
+            {
+                Console.WriteLine("\t" + blob.Name);
+            }
         }
         catch (RequestFailedException ex)
         {
@@ -26,16 +66,36 @@ public class BlobService
         }
     }
 
-    public async Task UploadTextBlobToContainer()
+    public async Task GetBlobsInContainer(BlobContainerClient blobContainerClient, string prefix)
     {
-        string localPath = "data";
-        Directory.CreateDirectory(localPath);
-        string fileName = "quickstart-" + Guid.NewGuid().ToString() + ".txt";
-        string localFilePath = Path.Combine(localPath, fileName);
+        try
+        {
+            string exactPrefix = prefix.EndsWith("/") ? prefix : prefix + "/";
 
-        // Write text to the file
-        await File.WriteAllTextAsync(localFilePath, "Hello, World");
+            Console.WriteLine($"Blobs with prefix '{exactPrefix}':");
 
-        await UploadBlobToContainer(fileName, localFilePath);
+            await foreach (var blobItem in blobContainerClient.GetBlobsAsync(prefix: exactPrefix))
+            {
+                Console.WriteLine($"Blob Name: {blobItem.Name}");
+
+
+                BlobClient blobClient = blobContainerClient.GetBlobClient(blobItem.Name);
+                BlobProperties properties = await blobClient.GetPropertiesAsync();
+
+                Console.WriteLine("Metadata:");
+                foreach (var metadata in properties.Metadata)
+                {
+                    Console.WriteLine($"\tKey: {metadata.Key}, Value: {metadata.Value}");
+                }
+            }
+        }
+        catch (RequestFailedException ex)
+        {
+            Console.WriteLine($"Azure Request Failed: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+        }
     }
 }

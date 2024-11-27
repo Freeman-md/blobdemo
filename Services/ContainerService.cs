@@ -76,6 +76,22 @@ public class ContainerService
         }
     }
 
+    public async Task ChangeContainerAccessLevel(string containerName, PublicAccessType accessType) {
+        try
+        {
+            BlobContainerClient container = _blobServiceClient.GetBlobContainerClient(containerName);
+
+            container.SetAccessPolicy(accessType);
+        }
+        catch (RequestFailedException e)
+        {
+            Console.WriteLine("HTTP error code {0}: {1}",
+                                e.Status, e.ErrorCode);
+            Console.WriteLine(e.Message);
+            Console.ReadLine();
+        }
+    }
+
     public async Task ListContainers(string prefix, int? segmentSize)
     {
         try
