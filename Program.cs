@@ -40,6 +40,11 @@ BlobContainerClient blobContainerClient = blobServiceClient.GetBlobContainerClie
 
 BlobService blobService = new BlobService(blobContainerClient);
 
-await blobService.GetBlobsInContainer(blobContainerClient, "project-1");
+// await blobService.GetBlobsInContainer(blobContainerClient, "project-1");
 
-// await blobService.UploadTextBlobWithPrefixAsync();
+// foreach (var num in Enumerable.Range(1, 20))
+// {
+//     await blobService.UploadTextBlobWithPrefixAsync();
+// }
+
+await blobService.GetBlobsByMetaData(blobContainerClient, "category", "project-1");

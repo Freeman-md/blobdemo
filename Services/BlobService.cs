@@ -33,7 +33,7 @@ public class BlobService
 
             IDictionary<string, string> metadata = new Dictionary<string, string>
             {
-                { "status", "active" },
+                { "status", "in-progress" },
                 { "category", localPath }
             };
             await blobClient.SetMetadataAsync(metadata);
@@ -78,7 +78,6 @@ public class BlobService
             {
                 Console.WriteLine($"Blob Name: {blobItem.Name}");
 
-
                 BlobClient blobClient = blobContainerClient.GetBlobClient(blobItem.Name);
                 BlobProperties properties = await blobClient.GetPropertiesAsync();
 
@@ -97,5 +96,23 @@ public class BlobService
         {
             Console.WriteLine($"An error occurred: {ex.Message}");
         }
+    }
+
+    public async Task GetBlobsByMetaData(BlobContainerClient blobContainerClient, string key, string value)
+    {
+        Console.WriteLine($"Blobs with metadata '{key}={value}':");
+
+        await foreach (var blobItem in blobContainerClient.GetBlobsAsync())
+        {
+            BlobClient blobClient = blobContainerClient.GetBlobClient(blobItem.Name);
+            BlobProperties blobProperties = await blobClient.GetPropertiesAsync();
+
+            if (blobProperties.Metadata.ContainsKey(key) && blobProperties.Metadata[key] == value)
+            {
+                Console.WriteLine(blobItem.Name);
+
+            }
+        }
+
     }
 }
