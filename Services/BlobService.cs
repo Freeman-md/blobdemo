@@ -10,7 +10,7 @@ public class BlobService
         _blobContainerClient = containerClient;
     }
 
-    public async Task UploadTextBlobWithPrefixAsync()
+    public async Task<(string, string)?> UploadTextBlobWithPrefixAsync()
     {
         try
         {
@@ -38,15 +38,35 @@ public class BlobService
             };
             await blobClient.SetMetadataAsync(metadata);
 
-            Console.WriteLine("Upload completed successfully.");
+            Console.WriteLine($"Upload for {0} completed successfully.", localFilePath);
+
+            return (blobName, localFilePath);
         }
         catch (RequestFailedException ex)
         {
             Console.WriteLine($"Request failed: {ex.Message}");
+
+            return null;
         }
         catch (Exception ex)
         {
             Console.WriteLine($"An error occurred: {ex.Message}");
+
+            return null;
+        }
+    }
+
+    public async Task DownloadBlob(string blobName, string localFilePath) {
+        string downloadFilePath = localFilePath.Replace(".txt", "DOWNLOADED.txt");
+
+        Console.WriteLine("\nDownloading blob to\n\t{0}\n", downloadFilePath);
+
+        try {
+            BlobClient blobClient = _blobContainerClient.GetBlobClient(blobName);
+
+            await blobClient.DownloadToAsync(downloadFilePath);
+        } catch (RequestFailedException ex) {
+            Console.WriteLine($"Request failed: {ex.Message}");
         }
     }
 
