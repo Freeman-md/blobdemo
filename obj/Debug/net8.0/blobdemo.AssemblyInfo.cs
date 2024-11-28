@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("blobdemo")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+020c9f1abdc6b7e9dde5fc8026060322db20ef1d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+49b3abf04cbbc0f1dbdbaac9ce57e7ee3a13978a")]
 [assembly: System.Reflection.AssemblyProductAttribute("blobdemo")]
 [assembly: System.Reflection.AssemblyTitleAttribute("blobdemo")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

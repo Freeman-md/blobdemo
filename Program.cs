@@ -34,17 +34,20 @@ BlobServiceClient GetBlobServiceClient()
 
 BlobServiceClient blobServiceClient = GetBlobServiceClient();
 
-string containerName = "container-e55355af-d14a-481b-ae97-112b65ca02bc";
+ContainerService containerService = new ContainerService(blobServiceClient);
 
+string containerName = "container-e55355af-d14a-481b-ae97-112b65ca02bc";
 BlobContainerClient blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
+
+// containerService.ChangeContainerAccessLevel(containerName, PublicAccessType.BlobContainer);
 
 BlobService blobService = new BlobService(blobContainerClient);
 
-// await blobService.GetBlobsInContainer(blobContainerClient, "project-1");
+await blobService.GetBlobsInContainer(blobContainerClient, "project-1");
 
 // foreach (var num in Enumerable.Range(1, 20))
 // {
 //     await blobService.UploadTextBlobWithPrefixAsync();
 // }
 
-await blobService.GetBlobsByMetaData(blobContainerClient, "category", "project-1");
+// await blobService.GetBlobsByMetaData(blobContainerClient, "category", "project-1");

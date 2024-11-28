@@ -76,12 +76,14 @@ public class ContainerService
         }
     }
 
-    public async Task ChangeContainerAccessLevel(string containerName, PublicAccessType accessType) {
+    public void ChangeContainerAccessLevel(string containerName, PublicAccessType accessType) {
         try
         {
             BlobContainerClient container = _blobServiceClient.GetBlobContainerClient(containerName);
 
             container.SetAccessPolicy(accessType);
+
+            // Console.WriteLine("Container Access Level Changed: {0}", container.GetAccessPolicy());
         }
         catch (RequestFailedException e)
         {
