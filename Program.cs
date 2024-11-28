@@ -45,19 +45,27 @@ BlobService blobService = new BlobService(blobContainerClient);
 
 // await blobService.GetBlobsInContainer(blobContainerClient, "project-1");
 
-var result = await blobService.UploadTextBlobWithPrefixAsync();
+// var result = await blobService.UploadTextBlobWithPrefixAsync();
 
-if (result.HasValue)
-{
-    var (blobName, localFilePath) = result.Value;
-    Console.WriteLine($"Blob uploaded: {blobName}");
-    Console.WriteLine($"Local file path: {localFilePath}");
+// if (result.HasValue)
+// {
+//     var (blobName, localFilePath) = result.Value;
+//     Console.WriteLine($"Blob uploaded: {blobName}");
+//     Console.WriteLine($"Local file path: {localFilePath}");
 
-    await blobService.DownloadBlob(blobName, localFilePath);
-}
-else
-{
-    Console.WriteLine("Upload failed or returned null.");
+//     await blobService.DeleteBlob("project-6/file-4.txt");
+// }
+// else
+// {
+//     Console.WriteLine("Upload failed or returned null.");
+// }
+
+// await blobService.DeleteBlob("project-6/file-6.txt");
+
+foreach (var projectNum in Enumerable.Range(1, 10)) {
+    foreach (var fileNum in Enumerable.Range(1, 10)) {
+        await blobService.ChangeBlobAccessTier($"project-{projectNum}/file-{fileNum}.txt", AccessTier.Archive);
+    }
 }
 
 // foreach (var num in Enumerable.Range(1, 20))

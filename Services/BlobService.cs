@@ -56,16 +56,56 @@ public class BlobService
         }
     }
 
-    public async Task DownloadBlob(string blobName, string localFilePath) {
+    public async Task DownloadBlob(string blobName, string localFilePath)
+    {
         string downloadFilePath = localFilePath.Replace(".txt", "DOWNLOADED.txt");
 
         Console.WriteLine("\nDownloading blob to\n\t{0}\n", downloadFilePath);
 
-        try {
+        try
+        {
             BlobClient blobClient = _blobContainerClient.GetBlobClient(blobName);
 
             await blobClient.DownloadToAsync(downloadFilePath);
-        } catch (RequestFailedException ex) {
+        }
+        catch (RequestFailedException ex)
+        {
+            Console.WriteLine($"Request failed: {ex.Message}");
+        }
+    }
+
+    public async Task DeleteBlob(string blobName)
+    {
+        try
+        {
+            BlobClient blobClient = _blobContainerClient.GetBlobClient(blobName);
+
+            await blobClient.DeleteAsync();
+        }
+        catch (RequestFailedException ex)
+        {
+            Console.WriteLine($"Request failed: {ex.Message}");
+        }
+    }
+
+    public async Task ChangeBlobAccessTier(string blobName, AccessTier accessTier)
+    {
+        try
+        {
+            BlobClient blobClient = _blobContainerClient.GetBlobClient(blobName);
+
+            if (await blobClient.ExistsAsync())
+            {
+                await blobClient.SetAccessTierAsync(accessTier);
+                Console.WriteLine($"Access tier for blob '{blobName}' changed to '{accessTier}'.");
+            }
+            else
+            {
+                Console.WriteLine($"Blob '{blobName}' does not exist.");
+            }
+        }
+        catch (RequestFailedException ex)
+        {
             Console.WriteLine($"Request failed: {ex.Message}");
         }
     }
