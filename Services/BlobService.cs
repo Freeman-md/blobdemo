@@ -184,9 +184,8 @@ public class BlobService
 
     }
 
-    public async Task ListBlobsWithSasToken(string sasUrl)
+    public async Task ListBlobs(BlobContainerClient containerClient)
     {
-        BlobContainerClient containerClient = new BlobContainerClient(new Uri(sasUrl));
         await foreach (var blob in containerClient.GetBlobsAsync())
         {
             Console.WriteLine($"Blob: {blob.Name}");

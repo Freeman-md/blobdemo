@@ -41,50 +41,20 @@ ContainerService containerService = new ContainerService(blobServiceClient);
 string containerName = "container-e55355af-d14a-481b-ae97-112b65ca02bc";
 BlobContainerClient blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
 
-// containerService.ChangeContainerAccessLevel(containerName, PublicAccessType.BlobContainer);
-
 BlobService blobService = new BlobService(blobContainerClient);
-
-// await blobService.GetBlobsInContainer(blobContainerClient, "project-1");
-
-// var result = await blobService.UploadTextBlobWithPrefixAsync();
-
-// if (result.HasValue)
-// {
-//     var (blobName, localFilePath) = result.Value;
-//     Console.WriteLine($"Blob uploaded: {blobName}");
-//     Console.WriteLine($"Local file path: {localFilePath}");
-
-//     await blobService.DeleteBlob("project-6/file-4.txt");
-// }
-// else
-// {
-//     Console.WriteLine("Upload failed or returned null.");
-// }
-
-// await blobService.DeleteBlob("project-6/file-6.txt");
-
-// foreach (var num in Enumerable.Range(1, 10)) {
-
-//         await blobService.DeleteBlob($"file-{num}.txt");
-
-// }
-
-// foreach (var num in Enumerable.Range(1, 20))
-// {
-//     await blobService.UploadTextBlobWithPrefixAsync();
-// }
-
-// await blobService.GetBlobsByMetaData(blobContainerClient, "category", "project-1");
 
 try
 {
-    BlobContainerSasPermissions permissions = BlobContainerSasPermissions.Read | BlobContainerSasPermissions.List;
+    BlobContainerSasPermissions permissions = BlobContainerSasPermissions.Write;
     DateTimeOffset expiresOn = DateTimeOffset.UtcNow.AddHours(1);
 
     Uri sasUri = await containerService.GenerateUserDelegationSasToken(blobServiceClient, blobContainerClient, permissions, expiresOn);
 
     Console.WriteLine($"Generated SAS URI: {sasUri}");
+
+    BlobContainerClient containerClientSAS = new BlobContainerClient(sasUri);
+
+    await blobService.ListBlobs(containerClientSAS); // should throw an error because only write permissions are allowed
 }
 catch (System.Exception ex)
 {
