@@ -1,15 +1,17 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection.Metadata;
 using Azure;
 using Azure.Identity;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
+using Azure.Storage.Sas;
 
 
 BlobServiceClient GetBlobServiceClient()
 {
     try
-    { 
+    {
         // Initialize BlobServiceClient with DefaultAzureCredential
         BlobServiceClient client = new BlobServiceClient(
             new Uri("https://blobdemostorageaccount.blob.core.windows.net"),
@@ -62,11 +64,11 @@ BlobService blobService = new BlobService(blobContainerClient);
 
 // await blobService.DeleteBlob("project-6/file-6.txt");
 
-foreach (var projectNum in Enumerable.Range(1, 10)) {
-    foreach (var fileNum in Enumerable.Range(1, 10)) {
-        await blobService.ChangeBlobAccessTier($"project-{projectNum}/file-{fileNum}.txt", AccessTier.Archive);
-    }
-}
+// foreach (var num in Enumerable.Range(1, 10)) {
+
+//         await blobService.DeleteBlob($"file-{num}.txt");
+
+// }
 
 // foreach (var num in Enumerable.Range(1, 20))
 // {
@@ -74,3 +76,17 @@ foreach (var projectNum in Enumerable.Range(1, 10)) {
 // }
 
 // await blobService.GetBlobsByMetaData(blobContainerClient, "category", "project-1");
+
+try
+{
+    BlobContainerSasPermissions permissions = BlobContainerSasPermissions.Read | BlobContainerSasPermissions.List;
+    DateTimeOffset expiresOn = DateTimeOffset.UtcNow.AddHours(1);
+
+    Uri sasUri = await containerService.GenerateUserDelegationSasToken(blobServiceClient, blobContainerClient, permissions, expiresOn);
+
+    Console.WriteLine($"Generated SAS URI: {sasUri}");
+}
+catch (System.Exception ex)
+{
+    Console.WriteLine($"An error occurred: {ex.Message}");
+}

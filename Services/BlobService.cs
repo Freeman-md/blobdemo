@@ -38,7 +38,7 @@ public class BlobService
             };
             await blobClient.SetMetadataAsync(metadata);
 
-            Console.WriteLine($"Upload for {0} completed successfully.", localFilePath);
+            Console.WriteLine("Upload for {0} completed successfully.", localFilePath);
 
             return (blobName, localFilePath);
         }
@@ -80,7 +80,15 @@ public class BlobService
         {
             BlobClient blobClient = _blobContainerClient.GetBlobClient(blobName);
 
-            await blobClient.DeleteAsync();
+            if (await blobClient.ExistsAsync())
+            {
+                await blobClient.DeleteAsync();
+                Console.WriteLine($"Blob '{blobName}' deleted");
+            }
+            else
+            {
+                Console.WriteLine($"Blob '{blobName}' does not exist.");
+            }
         }
         catch (RequestFailedException ex)
         {
@@ -174,5 +182,14 @@ public class BlobService
             }
         }
 
+    }
+
+    public async Task ListBlobsWithSasToken(string sasUrl)
+    {
+        BlobContainerClient containerClient = new BlobContainerClient(new Uri(sasUrl));
+        await foreach (var blob in containerClient.GetBlobsAsync())
+        {
+            Console.WriteLine($"Blob: {blob.Name}");
+        }
     }
 }

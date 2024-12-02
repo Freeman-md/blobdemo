@@ -3,6 +3,7 @@ using Azure.Identity;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
+using Azure.Storage.Sas;
 
 public class ContainerService
 {
@@ -76,7 +77,8 @@ public class ContainerService
         }
     }
 
-    public void ChangeContainerAccessLevel(string containerName, PublicAccessType accessType) {
+    public void ChangeContainerAccessLevel(string containerName, PublicAccessType accessType)
+    {
         try
         {
             BlobContainerClient container = _blobServiceClient.GetBlobContainerClient(containerName);
@@ -243,6 +245,39 @@ public class ContainerService
 
         Console.WriteLine($"Public access level: {properties.Value.PublicAccess}");
         Console.WriteLine($"Last modified: {properties.Value.LastModified}");
+    }
+
+    // Generate a SAS token for a container
+    public async Task<Uri> GenerateUserDelegationSasToken(BlobServiceClient blobServiceClient, BlobContainerClient containerClient, BlobContainerSasPermissions permissions, DateTimeOffset expiresOn)
+    {
+        if (!containerClient.Exists())
+        {
+            throw new InvalidOperationException($"Container '{containerClient.Name}' does not exist.");
+        }
+
+        UserDelegationKey userDelegationKey = await blobServiceClient.GetUserDelegationKeyAsync( DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddDays(1));
+
+        BlobSasBuilder sasBuilder = new BlobSasBuilder
+        {
+            BlobContainerName = containerClient.Name,
+            Resource = "c", // 'c' for container-level SAS
+            StartsOn = DateTimeOffset.UtcNow,
+            ExpiresOn = expiresOn
+        };
+
+        sasBuilder.SetPermissions(permissions);
+
+        BlobUriBuilder uriBuilder = new BlobUriBuilder(containerClient.Uri)
+        {
+            // Specify the user delegation sas
+            Sas = sasBuilder.ToSasQueryParameters(
+                userDelegationKey,
+                containerClient.GetParentBlobServiceClient().AccountName
+            )
+        };
+
+        return uriBuilder.ToUri();
+
     }
 
 
