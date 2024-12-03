@@ -38,6 +38,8 @@ public class BlobService
             };
             await blobClient.SetMetadataAsync(metadata);
 
+            await blobClient.SetTagsAsync(metadata);
+
             Console.WriteLine("Upload for {0} completed successfully.", localFilePath);
 
             return (blobName, localFilePath);
